@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <link rel="apple-touch-icon" href="/icon192.png">
+    <link rel="icon" type="image/png" href="/icon192.png">
+    <title>Community Events App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+
+body{
+  font-family: Arial, sans-serif;
+  background:#f2f2f2;
+  margin:0;
+  padding:0;
+}
+
+.header{
+  background:#4db2b0;
+  color:white;
+  text-align:center;
+  padding:20px;
+  font-size:28px;
+  font-weight:bold;
+}
+
+.container{
+  width:400px;
+  margin:40px auto;
+  background:white;
+  padding:20px;
+  border-radius:8px;
+  box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+h2{
+  text-align:center;
+}
+
+input{
+  width:100%;
+  padding:8px;
+  margin:5px 0;
+  border:1px solid #ccc;
+  border-radius:4px;
+}
+
+button{
+  padding:8px 12px;
+  margin-top:5px;
+  border:none;
+  border-radius:4px;
+  cursor:pointer;
+}
+
+.addBtn{
+  background:#59b8de;
+  color:white;
+  width:100%;
+}
+
+.editBtn{
+  background:#ffc107;
+}
+
+.deleteBtn{
+  background:#dc3545;
+  color:white;
+}
+
+.event{
+  background:#fafafa;
+  padding:10px;
+  margin-top:10px;
+  border-radius:5px;
+  border-left:4px solid #28a745;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+Community Events
+</div>
+
+<div class="container">
+
+<h2>Add Community Event</h2>
+
+<input type="text" id="eventTitle" placeholder="Event Name">
+<input type="date" id="eventDate">
+<input type="text" id="eventLocation" placeholder="Event Location">
+<input type="text" id="eventDescription" placeholder="Event Description">
+
+<button class="addBtn" onclick="addEvent()">Add Event</button>
+
+<div id="eventList"></div>
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", displayEvents);
+
+function getEvents(){
+  return JSON.parse(localStorage.getItem("events")) || [];
+}
+
+function saveEvents(events){
+  localStorage.setItem("events", JSON.stringify(events));
+}
+
+function addEvent(){
+
+  const title = document.getElementById("eventTitle").value;
+  const date = document.getElementById("eventDate").value;
+  const location = document.getElementById("eventLocation").value;
+  const description = document.getElementById("eventDescription").value;
+
+  if(title.trim()==="" || date==="" || location.trim()==="" || description.trim()===""){
+    alert("Please fill in all fields");
+    return;
+  }
+
+  const events = getEvents();
+
+  events.push({
+    title:title,
+    date:date,
+    location:location,
+    description:description
+  });
+
+  saveEvents(events);
+
+  document.getElementById("eventTitle").value="";
+  document.getElementById("eventDate").value="";
+  document.getElementById("eventLocation").value="";
+  document.getElementById("eventDescription").value="";
+
+  displayEvents();
+}
+
+function displayEvents(){
+
+  const events = getEvents();
+  const list = document.getElementById("eventList");
+
+  list.innerHTML="";
+
+  events.forEach((event,index)=>{
+
+    list.innerHTML += `
+      <div class="event">
+        <b>${event.title}</b><br>
+        Date: ${event.date}<br>
+        Location: ${event.location}<br>
+        Description: ${event.description}<br><br>
+
+        <button class="editBtn" onclick="editEvent(${index})">Edit</button>
+        <button class="deleteBtn" onclick="deleteEvent(${index})">Delete</button>
+      </div>
+    `;
+
+  });
+
+}
+
+function deleteEvent(index){
+
+  const events = getEvents();
+  events.splice(index,1);
+
+  saveEvents(events);
+  displayEvents();
+
+}
+
+function editEvent(index){
+
+  const events = getEvents();
+
+  const newTitle = prompt("Edit Event Name:", events[index].title);
+  const newDate = prompt("Edit Date:", events[index].date);
+  const newLocation = prompt("Edit Location:", events[index].location);
+  const newDescription = prompt("Edit Description:", events[index].description);
+
+  if(newTitle && newDate && newLocation && newDescription){
+    events[index].title = newTitle;
+    events[index].date = newDate;
+    events[index].location = newLocation;
+    events[index].description = newDescription;
+  }
+
+  saveEvents(events);
+  displayEvents();
+
+}
+
+</script>
+
+</body>
+</html>
